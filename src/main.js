@@ -9,6 +9,9 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 const routes = [
   { path: "/", component: () => import("./components/Home.vue") },
+  { path: "/register", component: () => import("./components/Register.vue") },
+  { path: "/login", component: () => import("./components/Login.vue") },
+  { path: "/lobby", component: () => import("./components/Lobby.vue") },
 ];
 
 const router = createRouter({
