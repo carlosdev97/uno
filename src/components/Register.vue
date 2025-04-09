@@ -1,137 +1,126 @@
 <template>
-  <div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="text-center border rounded p-4 shadow" style="width: 420px">
-      <h3 class="fw-bold mb-4">Registro</h3>
-
-      <div class="border rounded p-3 bg-light text-start">
-        <div class="mb-3">
-          <label for="username" class="form-label fw-bold"
-            >Nombre de usuario</label
-          >
-          <input
-            type="text"
-            id="username"
-            class="form-control"
-            placeholder="Ingresa tu nombre de usuario"
-            v-model="username"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label for="email" class="form-label fw-bold">Correo</label>
-          <input
-            type="email"
-            id="email"
-            class="form-control"
-            placeholder="correo@ejemplo.com"
-            v-model="email"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label for="password" class="form-label fw-bold">Contraseña</label>
-          <input
-            type="password"
-            id="password"
-            class="form-control"
-            placeholder="********"
-            v-model="password"
-          />
-        </div>
-
-        <button
-          class="btn btn-light border fw-bold w-100"
-          @click="handleSubmit"
-        >
-          Registrarse
-        </button>
-      </div>
-
-      <div class="mt-3">
-        <small
-          ><a href="#" class="text-decoration-none">iniciar sesión</a></small
-        >
+  <div class="container-register">
+    <div class="card card-register mx-auto">
+      <div class="card-body card-body-register">
+        <h2 class="text-center">Registro</h2>
+        <form @submit.prevent="handleRegister">
+          <div class="mb-3">
+            <label class="form-label">Nombre de usuario</label>
+            <input type="text" class="form-control" v-model="name" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Correo electrónico</label>
+            <input type="email" class="form-control" v-model="email" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input type="password" class="form-control" v-model="password" />
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Registrarse</button>
+          </div>
+        </form>
+        <p class="text-center mt-3">
+          ¿Ya tienes cuenta? <router-link to="/login">Inicia sesión</router-link>
+        </p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
-import {
-  auth,
-  db,
-  createUserWithEmailAndPassword,
-  setDoc,
-  doc,
-} from "../firebase";
-import { updateProfile } from "firebase/auth";
-import { query, collection, where, getDocs } from "firebase/firestore";
-import { useRouter } from "vue-router";
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { getFirestore, doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import Swal from 'sweetalert2';
+
+
 
 export default {
   setup() {
-    const username = ref("");
-    const email = ref("");
-    const password = ref("");
-
+    const name = ref('');
+    const email = ref('');
+    const password = ref('');
     const router = useRouter();
+    
+    const auth = getAuth();
+    const db = getFirestore();
 
-    // Función para verificar si el usuario ya existe
-    const checkUserExists = async (email) => {
-      const userRef = query(
-        collection(db, "users"),
-        where("email", "==", email)
-      );
-      const userSnapshot = await getDocs(userRef);
-      return !userSnapshot.empty; // Si el usuario ya existe, devuelve true
+    const verificarNombreUnico = async (nombre) => {
+      const q = query(collection(db, "usuarios"), where("name", "==", nombre));
+      const querySnapshot = await getDocs(q);
+      return !querySnapshot.empty;
     };
 
-    // Función para manejar el registro de usuarios
-    const handleSubmit = async () => {
-      if (!username.value || !email.value || !password.value) {
-        alert("Por favor, completa todos los campos");
+    const handleRegister = async () => {
+      if (!name.value || !email.value || !password.value) {
+        Swal.fire({
+        icon: 'warning',
+        title: 'Campos incompletos',
+        text: 'Todos los campos son obligatorios.',
+        confirmButtonText: 'OK'
+        });
+        //toast.error("Todos los campos son obligatorios");
         return;
       }
+      
 
       try {
-        const userExists = await checkUserExists(email.value);
-        if (userExists) {
-          alert("El correo ya está en uso");
+        const existeNombre = await verificarNombreUnico(name.value);
+        if (existeNombre) {
+          Swal.fire({
+          icon: 'error',
+            title: 'Nombre en uso',
+          text: 'El nombre de usuario ya fue registrado por otro jugador.',
+          confirmButtonText: 'OK'
+        });
+
+          //toast.error("El nombre de usuario ya está en uso.");
           return;
         }
 
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email.value,
-          password.value
-        );
+        const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value);
         const user = userCredential.user;
+        await updateProfile(user, { displayName: name.value });
 
-        await updateProfile(user, { displayName: username.value });
-
-        // Guardar en Firestore
-        await setDoc(doc(db, "users", user.uid), {
-          username: username.value,
-          email: user.email,
-          createdAt: new Date(),
+        await setDoc(doc(db, "usuarios", user.uid), {
+          uid: user.uid,
+          name: name.value,
+          email: email.value,
         });
-
-        alert("¡Registro exitoso!");
+        Swal.fire({
+        icon: "success",
+        title: "Registrado",
+        text: "Usuario registrado.",
+        confirmButtonText: "OK",
+      });
+  //toast.success("Registro exitoso. Inicia sesión.");
         router.push("/login");
       } catch (error) {
-        console.log(error.message);
+        handleAuthError(error.code);
       }
     };
 
-    return {
-      username,
-      email,
-      password,
-      handleSubmit,
+    const handleAuthError = (errorCode) => {
+      const errorMessages = {
+        'auth/email-already-in-use': "El correo ya está registrado.",
+        'auth/invalid-email': "Correo inválido.",
+        'auth/weak-password': "La contraseña debe tener al menos 6 caracteres.",
+      };
+      Swal.fire({
+        icon: "error",
+        title: "Error de autenticación",
+        text: errorMessages[errorCode] || "Error al registrar. Inténtalo de nuevo.",
+        confirmButtonText: "OK",
+      });
     };
-  },
+
+    return { name, email, password, handleRegister };
+  }
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+@import '../styles/register.css';
+</style>

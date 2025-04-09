@@ -1,82 +1,105 @@
 <template>
-  <div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="text-center border rounded p-4 shadow" style="width: 420px">
-      <h3 class="fw-bold mb-4">Iniciar sesión</h3>
-
-      <div class="border rounded p-3 bg-light text-start">
-        <div class="mb-3">
-          <label for="email" class="form-label fw-bold">Correo</label>
-          <input
-            type="email"
-            id="email"
-            class="form-control"
-            placeholder="correo@ejemplo.com"
-            v-model="email"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label for="password" class="form-label fw-bold">Contraseña</label>
-          <input
-            type="password"
-            id="password"
-            class="form-control"
-            placeholder="********"
-            v-model="password"
-          />
-        </div>
-
-        <button
-          class="btn btn-light border fw-bold w-100"
-          @click="handleSubmit"
-        >
-          Ingresar
-        </button>
-      </div>
-
-      <div class="mt-3">
-        <small><a href="#" class="text-decoration-none">Registrarse</a></small>
+  <div class="container-login">
+    <div class="card card-login">
+      <div class="card-body card-body-login">
+        <h1 class="text-center">Iniciar Sesión</h1>
+        <form @submit.prevent="handleLogin">
+          <div class="mb-3">
+            <label class="form-label">Correo electrónico</label>
+            <input type="email" class="form-control" v-model="email" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input type="password" class="form-control" v-model="password" />
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+          </div>
+        </form>
+        <p class="mt-3 text-center">
+          ¿No tienes cuenta? <router-link to="/register">Regístrate aquí</router-link>
+        </p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
-import { useRouter } from "vue-router";
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase/config.js';
+import Swal from 'sweetalert2';
+
 
 export default {
   setup() {
-    const email = ref("");
-    const password = ref("");
-
+    const email = ref('');
+    const password = ref('');
     const router = useRouter();
-
-    const handleSubmit = async () => {
-      if (!email.value || !password.value) {
-        alert("Por favor, completa todos los campos.");
+    
+    const handleLogin = async () => {
+      if ( !email.value || !password.value) {
+        //alerta de sweetalert2
+        Swal.fire({
+        title: '¡Error!',
+        text: 'Debes llenar todos los campos.',
+        icon: 'error',
+        });
+        
         return;
       }
+    try {
+      await signInWithEmailAndPassword(auth, email.value, password.value);
 
-      try {
-        await signInWithEmailAndPassword(auth, email.value, password.value);
-        alert("Inicio de sesión exitoso.");
-        router.push("/lobby"); // Redirigir a la página de lobby después de iniciar sesión
-      } catch (error) {
-        alert("Error al iniciar sesión. Inténtalo de nuevo.");
-        alert(error.message);
-      }
+      Swal.fire({
+        title: '¡Bienvenido!',
+        text: 'Has iniciado sesión correctamente.',
+        icon: 'success',
+        confirmButtonText: 'Continuar'
+      }).then(() => {
+        router.push("/home");
+      });
+
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+
+      Swal.fire({
+        title: 'Error',
+        text: error.message.includes('auth/user-not-found')
+          ? 'El usuario no existe.'
+          : error.message.includes('auth/wrong-password')
+          ? 'Contraseña incorrecta.'
+          : 'No se puede iniciar sesión.',
+        icon: 'error',
+        confirmButtonText: 'Intentar de nuevo'
+      });
+    }
+  };
+
+
+    const handleAuthError = (errorCode) => {
+      const errorMessages = {
+        'auth/invalid-credential': "Correo o contraseña incorrectos",
+        'auth/user-not-found': "El usuario no está registrado",
+        'auth/wrong-password': "Contraseña incorrecta",
+        'auth/invalid-email': "Correo no válido",
+        'auth/user-disabled': "Este usuario ha sido deshabilitado",
+      };
+      
+      Swal.fire({
+        title: '¡Problemas!',
+        text: {errorMessages},
+        icon: 'Error',
+        confirmButtonText: 'Intentar de nuevo.'
+      })
     };
 
-    return {
-      email,
-      password,
-      handleSubmit,
-    };
-  },
+    return { email, password, handleLogin };
+  }
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+@import '../styles/login.css';
+</style>

@@ -4,12 +4,6 @@
       <img src="../assets/uno.png" alt="Logo UNO" class="mb-4" style="width: 120px"
       />
       <div class="border rounded p-3 bg-light">
-        <RouterLink to="/login" class="btn btn-light border fw-bold w-100 mb-2">
-          Ingresar
-        </RouterLink>
-        <RouterLink to="/register" class="btn btn-light border fw-bold w-100">
-          Registrarse
-        </RouterLink>
         <button class="btn btn-light border fw-bold w-100 mb-2" @click="$router.push('/login')">Logearse</button>
         <button class="btn btn-light border fw-bold w-100" @click="$router.push('/register')">Registrarse</button>
       </div>

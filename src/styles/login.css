@@ -1,0 +1,75 @@
+.container-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    background-image: url('../images/Fondo_signup.jpg');    
+    background-size: cover;  /* Ajusta la imagen responsive */    
+    background-position: center
+}
+
+.card-login {
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background: white;
+}
+
+/* Asegurar que el padding sea adaptable */
+.card-body-login {
+    padding: 2rem;
+}
+
+/* Estilos generales para inputs */
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    font-size: 16px;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco con opacidad */
+}
+
+.form-control:focus {    
+    border-color: #007bff; /* Cambia el color del borde al enfocar */    
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Sombra azul al enfocar */
+}
+
+/* Estilos del botón */
+.btn-primary {
+    background-color: #007bff;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 2px solid black;
+    width: 100%; /* Hace que el botón ocupe todo el ancho disponible */
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Enlaces */
+.text-center a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.text-center a:hover {
+    text-decoration: underline;
+}
+
+/* Hacer el diseño más adaptable en pantallas pequeñas */
+@media (max-width: 480px) {
+    .card-body-login {
+        padding: 1.5rem;
+    }
+
+    .btn-primary {
+        font-size: 14px;
+        padding: 8px;
+    }
+}
