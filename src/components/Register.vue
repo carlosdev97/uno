@@ -39,7 +39,12 @@
           />
         </div>
 
-        <button class="btn btn-light border fw-bold w-100">Registrarse</button>
+        <button
+          class="btn btn-light border fw-bold w-100"
+          @click="handleSubmit"
+        >
+          Registrarse
+        </button>
       </div>
 
       <div class="mt-3">
