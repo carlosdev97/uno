@@ -13,6 +13,7 @@
             id="username"
             class="form-control"
             placeholder="Ingresa tu nombre de usuario"
+            v-model="username"
           />
         </div>
 
@@ -23,6 +24,7 @@
             id="email"
             class="form-control"
             placeholder="correo@ejemplo.com"
+            v-model="email"
           />
         </div>
 
@@ -33,6 +35,7 @@
             id="password"
             class="form-control"
             placeholder="********"
+            v-model="password"
           />
         </div>
 
@@ -49,8 +52,79 @@
 </template>
 
 <script>
+import { ref } from "vue";
+import {
+  auth,
+  db,
+  createUserWithEmailAndPassword,
+  setDoc,
+  doc,
+} from "../firebase";
+import { updateProfile } from "firebase/auth";
+import { query, collection, where, getDocs } from "firebase/firestore";
+
 export default {
-  name: "Register",
+  setup() {
+    const username = ref("");
+    const email = ref("");
+    const password = ref("");
+
+    const router = useRouter();
+
+    // Función para verificar si el usuario ya existe
+    const checkUserExists = async (email) => {
+      const userRef = query(
+        collection(db, "users"),
+        where("email", "==", email)
+      );
+      const userSnapshot = await getDocs(userRef);
+      return !userSnapshot.empty; // Si el usuario ya existe, devuelve true
+    };
+
+    // Función para manejar el registro de usuarios
+    const handleSubmit = async () => {
+      if (!username.value || !email.value || !password.value) {
+        alert("Por favor, completa todos los campos");
+        return;
+      }
+
+      try {
+        const userExists = await checkUserExists(email.value);
+        if (userExists) {
+          alert("El correo ya está en uso");
+          return;
+        }
+
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email.value,
+          password.value
+        );
+        const user = userCredential.user;
+
+        await updateProfile(user, { displayName: username.value });
+
+        // Guardar en Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          username: username.value,
+          email: user.email,
+          createdAt: new Date(),
+        });
+
+        alert("¡Registro exitoso!");
+        router.push("/login");
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+
+    return {
+      username,
+      email,
+      password,
+      handleSubmit,
+    };
+  },
 };
 </script>
 
