@@ -62,6 +62,7 @@ import {
 } from "../firebase";
 import { updateProfile } from "firebase/auth";
 import { query, collection, where, getDocs } from "firebase/firestore";
+import { useRouter } from "vue-router";
 
 export default {
   setup() {
