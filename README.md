@@ -94,6 +94,11 @@ ssh-add ~/.ssh/id_ed25519</code></pre>
 <h2>👨‍💻 Autor(es)</h2>
 <p>Desarrollado por:</p> <a href="https://github.com/carlosdev97">Carlos Dev</a>.
 <p><a href="https://github.com/MiguelLoaizaDev">MiguelLoaizaDev</a>.</p>
+<p><a href="https://github.com/SanthiagoPerez">SanthiagoPerez</a>.</p>
+<p><a href="https://github.com/Ds1808">Ds1808</a>.</p>
+<p><a href="https://github.com/Hermis999">Hermis999</a>.</p>
+<p><a href="https://github.com/Alvarez-03">Alvarez-03</a>.</p>
+<p><a href="https://github.com/Juann-18">Juann-18</a>.</p>
 
 <hr>
 <p>¡Si te gusta este proyecto, no olvides darle una ⭐ en <a href="https://github.com/carlosdev97/uno">GitHub</a>!</p>
