@@ -1,17 +1,19 @@
+.body{
+    background-image: url("https://wallpapers.com/images/hd/uno-card-red-poster-fahn507dk0y40lko.jpg");
+    background-size: cover;
+    background-position: center;
+}
 .container-inicio {
-    background-image: url('../images/photo-1611371805663-af65e62e9071.jpeg');    
-    background-size: cover;  /* Ajusta la imagen responsive */    
+    background-size: cover;
     background-position: center;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    padding: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.947);
 }
 
 .card-inicio {
-    width: 100%;
-    max-width: 400px;
+    width: 100vh;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     background-color: rgba(255, 255, 255, 0.8);
@@ -19,29 +21,27 @@
 
 .card-body-inicio {
     padding: 2rem;
+    display: flexbox;
+    justify-content: center;
 }
-
-/* @media (max-width: 600px) {
-
-    .container-inicio {
-        padding: 0px;
-        min-height: 100%;
-    }
-    .card-inicio {
-        background: url("./images/fondo.jpg") no-repeat center center fixed;
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .card-body-inicio {
-        width: 100%;
-        max-width: 400px;
-        padding: 2rem;
-    }
-
-
-} */
+.text-center{
+    font-weight: bold;
+}
+.btn-primary{
+    background-color: #ff0e0e;
+    color: black;
+}
+.btn-primary:hover{
+    background-color: #ab2121;
+}
+.btn-success{
+    background-color: #e5ff00;
+    color: black;
+}
+.btn-success:hover{
+    background-color: #a4ab21;
+}
+.btn{
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.362);
+    font-weight: bold;
+}

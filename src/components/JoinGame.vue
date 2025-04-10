@@ -12,10 +12,10 @@
         />
 
         <div class="d-grid">
-          <button class="btn btn-outline-success" @click="unirseAPartida" :disabled="esperandoInicio">
+          <button class="btn btn-success" @click="unirseAPartida" :disabled="esperandoInicio">
             {{ esperandoInicio ? "Esperando..." : "Unirse" }}
           </button>
-          <button class="btn btn-danger mt-2" @click="$router.push('/inicio')">
+          <button class="btn btn-outline-danger mt-2" @click="$router.push('/home')">
             Cancelar
           </button>
         </div>
@@ -46,7 +46,6 @@ export default {
     const esperandoInicio = ref(false);
     const partidaIniciada = ref(false);
     const jugadores = ref([]);
-    const saldo = ref(1500);
 
     const auth = getAuth();
     const db = getFirestore();
@@ -95,13 +94,13 @@ export default {
 
         // Valida si la partida ya está llena
         const jugadoresSnapshot = await getDocs(jugadoresRef);
-        if (jugadoresSnapshot.size >= 6) {
+        if (jugadoresSnapshot.size >= 4) {
           Swal.fire("Sala llena", "La sala ha alcanzado su capacidad máxima de jugadores.", "error");
           return;
         }
 
         // Añade al jugador como un documento en la subcolección "jugadores"
-        await setDoc(jugadorDocRef, { nombre: jugadorActual, saldo: 1500, uid });
+        await setDoc(jugadorDocRef, { nombre: jugadorActual, uid });
 
         esperandoInicio.value = true;
         Swal.fire({
@@ -145,7 +144,6 @@ export default {
       esperandoInicio,
       partidaIniciada,
       jugadores,
-      saldo,
       unirseAPartida,
     };
   },

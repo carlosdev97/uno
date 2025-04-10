@@ -2,36 +2,35 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    padding: 20px; /* Evita que el contenido se pegue en móviles */
-    background-image: url('../images/Fondo_signup.jpg');    
-    background-size: cover;  /* Ajusta la imagen responsive */    
-    background-position: center;
+    height: 100%;
 }
-
 .card-register {
-    width: 100%;
-    max-width: 400px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    height: 90%;
+    width: 85%; 
     border-radius: 10px;
-    background: white;
+    background: rgba(255, 255, 255, 0.83);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.947);
 }
 
-/* Ajuste del padding para mejor adaptabilidad */
-.card-body-register {
-    padding: 2rem;
+.card-body-register{
+    height: 100%;
 }
 
+form{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
 /* Inputs adaptables */
 .form-control {
+    height: 70%;
     background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco con opacidad */
     border-radius: 8px;
     border: 1px solid #ccc;
-    padding: 10px;
+    padding: 5px;
     font-size: 16px;
-    width: 100%;
 }
-
 .form-control:focus {    
     border-color: #007bff; /* Cambia el color del borde al enfocar */    
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Sombra azul al enfocar */
@@ -39,9 +38,10 @@
 
 /* Botón mejorado para adaptarse */
 .btn-primary {
-    background-color: #007bff;
+    background-color: #ff0e0e;
     border: none;
     padding: 10px;
+    margin-top: 10px;
     font-size: 16px;
     border-radius: 8px;
     width: 100%;
@@ -63,14 +63,24 @@
     text-decoration: underline;
 }
 
-/* Hacer el formulario más accesible en pantallas pequeñas */
-@media (max-width: 480px) {
-    .card-body-register {
-        padding: 1.5rem;
-    }
-
-    .btn-primary {
-        font-size: 14px;
-        padding: 8px;
-    }
+.box-form{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap: 10px;
+    height: 100%;
+}
+.img-login{
+    width: 40%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+input{
+    border: 1px solid black;
+}
+.btn{
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.256);
+    border: 1px solid black;
 }
