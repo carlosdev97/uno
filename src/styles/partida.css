@@ -1,0 +1,51 @@
+.container-partida{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+}
+nav{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.995);
+    width: 100%;
+    height: 14%;
+    border: 2px solid black;
+    padding: 5px;
+}
+main{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 90%;
+    width: 100%;
+}
+.container-mesa{
+    height: 100%;
+    width: 80%;
+}
+.mesa-top{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 10%;
+}
+.mesa-bottom{
+    height: 90%;
+    width: 100%;
+}
+.img-mesa {
+    width: 100%;   /* Ancho deseado */
+    height: 100%;   /* Alto deseado */
+    object-fit: fill; /* Fuerza la imagen a rellenar el espacio, deformándose si es necesario */
+}
+.container-acciones{
+    height: 100%;
+    width: 20%;
+}

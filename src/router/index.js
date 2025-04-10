@@ -7,6 +7,7 @@ import Login from '../components/Login.vue';
 import Register from '../components/Register.vue';
 import CreateGame from '../components/CreateGame.vue';
 import JoinGame from '../components/JoinGame.vue';
+import Partida from '../components/Partida.vue';
 
 const routes = [
   { path: '/', name: 'login', component: Login },
@@ -14,6 +15,7 @@ const routes = [
   { path: '/home', name: 'home', component: Home, /*meta: { requiresAuth: true }*/ },
   { path: '/create-game', name: 'create-game', component: CreateGame, /*meta: { requiresAuth: true }*/ },
   { path: '/join-game', name: 'join-game', component: JoinGame, /*meta: { requiresAuth: true }*/ },
+  { path: '/partida/:codigo', name: 'partida', component: Partida, /*meta: { requiresAuth: true }*/ },
 ];
 
 const router = createRouter({
