@@ -27,18 +27,39 @@ main{
 }
 .container-mesa{
     height: 100%;
-    width: 80%;
+    width: 60%;
 }
 .mesa-top{
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    height: 10%;
+    height: 20%;
+    width: 100%;;
+}
+.btn-baraja{
+    height: 100%;
+    background-color: transparent;
+    border: none;
+    transform: rotate(-90deg);
+}
+.img-baraja{
+    width: 100%;
+    height: 100%;
 }
 .mesa-bottom{
-    height: 90%;
+    position: relative;
+    height: 80%;
     width: 100%;
+}
+.cartas-mesa{
+    width: 60px;
+    height: 90px;
+    background-color: rgba(255, 255, 255, 0.995);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 .img-mesa {
     width: 100%;   /* Ancho deseado */
@@ -46,6 +67,75 @@ main{
     object-fit: fill; /* Fuerza la imagen a rellenar el espacio, deformándose si es necesario */
 }
 .container-acciones{
-    height: 100%;
-    width: 20%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    height: 90%;
+    width: 30%;
 }
+.cartas{
+    background-color: rgba(255, 255, 255, 0.89);
+    height: 80%;
+    width: 100%;
+    font-size: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.cartas button{
+    font-size: 15px;
+    padding: 5px;
+}
+.cartas th{
+    background-color: gray;
+    border: 1px solid red;
+}
+.cartas tr{
+    background-color: rgba(255, 0, 0, 0.251);
+    border: 1px solid red;
+}
+.acciones{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 20%;
+    width: 90%;
+}
+
+#jugador-centrado{
+    position: absolute;
+    display: grid;
+    justify-content: center;
+}
+.container-cartas-player h5{
+    color: white;
+}
+.container-cartas-player img{
+    width: 30px;
+}
+
+#jugador-centrado {
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  #jugador-izquierda {
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  #jugador-derecha {
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  #jugador-abajo {
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+
+  

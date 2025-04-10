@@ -13,7 +13,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(p, index) in participantes" :key="index">
+                <tr v-for="(p, index) in participantesOrd" :key="index">
                   <td>{{ p.nombre }}</td>
                   <td>#{{ p.ordenTurno }}</td>
                 </tr>
@@ -44,6 +44,11 @@ const estado = ref("No iniciada");
 const router = useRouter();
 
 const { game, inicializarJuego, iniciarPartida, escucharJugadores } = createGame((url) => router.push(url));
+
+const participantesOrdenados = computed(() => {
+  // Clona el array y lo ordena por ordenTurno
+  return [...participantes.value].sort((a, b) => a.ordenTurno - b.ordenTurno);
+});
 
 onMounted(async () => {
   await inicializarJuego();
