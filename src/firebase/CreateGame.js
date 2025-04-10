@@ -110,9 +110,18 @@
         }
     }
 
+    function escucharJugadores(codigo, callback) {
+        const jugadoresRef = collection(db, "partidas", codigo, "jugadores");
+        return onSnapshot(jugadoresRef, (snapshot) => {
+            const jugadores = snapshot.docs.map(doc => doc.data());
+            callback(jugadores);
+        });
+        }
+
     return {
         game,
         inicializarJuego,
         iniciarPartida,
+        escucharJugadores,
     };
 }

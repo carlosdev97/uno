@@ -17,22 +17,6 @@
                   <td>{{ p.nombre }}</td>
                   <td>#{{ p.ordenTurno }}</td>
                 </tr>
-                <tr>
-                  <td>Hola mundo</td>
-                  <td>#2</td>
-                </tr>
-                <tr>
-                  <td>Hola mundo</td>
-                  <td>#2</td>
-                </tr>
-                <tr>
-                  <td>Hola mundo</td>
-                  <td>#2</td>
-                </tr>
-                <tr>
-                  <td>Hola mundo</td>
-                  <td>#2</td>
-                </tr>
               </tbody>
             </table>
           </div>
@@ -59,13 +43,18 @@ const participantes = ref([]);
 const estado = ref("No iniciada");
 const router = useRouter();
 
-const { game, inicializarJuego, iniciarPartida } = createGame((url) => router.push(url));
+const { game, inicializarJuego, iniciarPartida, escucharJugadores } = createGame((url) => router.push(url));
 
 onMounted(async () => {
   await inicializarJuego();
   codigo.value = game.codigo;
   participantes.value = game.participantes;
   estado.value = game.estado;
+
+  escucharJugadores(game.codigo, (jugadores) => {
+    console.log("🔥 Jugadores desde Firebase:", jugadores);
+    participantes.value = jugadores;
+  });
 });
 </script>
 
