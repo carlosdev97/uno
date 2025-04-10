@@ -2,8 +2,8 @@
   <div class="container-inicio">
     <div class="card card-inicio">
       <div class="card-body card-body-inicio">
-        <img src="../assets/uno.png" class="d-block mx-auto" alt="LogoUno" style=" width: 120px;">
-        <p class="text-center mt-2">Bienvenido, <span style="color: blue">{{ userName.toUpperCase() }}</span></p>
+        <img src="../assets/uno.png" class="logo d-block mx-auto" alt="LogoUno" style=" width: 120px;">
+        <p class="text-center mt-2">Bienvenido, <span style="color: yellow">{{ userName.toUpperCase() }}</span></p>
         <div class="d-grid gap-2">
           <button class="btn btn-primary" @click="$router.push('/create-game')">Crear partida</button>
           <button class="btn btn-success" @click="$router.push('/join-game')">Unirse a partida</button>
@@ -63,5 +63,5 @@ export default {
 </script>
 
 <style scoped>
-@import "../styles/home.css";
+@import "../styles/home3.css";
 </style>

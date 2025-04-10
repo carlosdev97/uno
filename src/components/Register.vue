@@ -4,7 +4,7 @@
       <div class="card-body card-body-register">
         <div class="box-form">
           <div class="img-login">
-            <img src="../assets/uno.png" class="" alt="LogoUno" style=" width: 80%;">
+            <img src="../assets/uno.png" class="logo" alt="LogoUno" style=" width: 80%;">
           </div>
           <form @submit.prevent="handleRegister">
             <div class="container-data">

@@ -4,7 +4,7 @@
       <div class="card-body card-body-login ">
         <div class="box-form">
           <div class="img-login">
-            <img src="../assets/uno.png" class="" alt="LogoUno" style=" width: 80%;">
+            <img src="../assets/uno.png" class="logo" alt="LogoUno" style=" width: 80%;">
           </div>
           <div class="container-datas">
             
