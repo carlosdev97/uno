@@ -63,5 +63,5 @@ export default {
 </script>
 
 <style scoped>
-@import "../styles/home3.css";
+@import "../styles/home.css";
 </style>
