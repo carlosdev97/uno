@@ -1,18 +1,23 @@
-    // src/firebase/home.js
-    import { ref, onMounted } from "vue";
+    import { ref } from "vue";
     import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
     import { getFirestore, doc, getDoc } from "firebase/firestore";
     import { useRouter } from "vue-router";
 
-    export function useHome() {
     const user = ref(null);
     const userName = ref("");
+
+    let authInitialized = false;
+
+    export function useHome() {
     const router = useRouter();
     const auth = getAuth();
     const db = getFirestore();
 
-    onMounted(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    // Esto asegura que no se duplique el listener al llamar varias veces
+    if (!authInitialized) {
+        authInitialized = true;
+
+        onAuthStateChanged(auth, async (currentUser) => {
         if (currentUser) {
             user.value = currentUser;
 
@@ -25,11 +30,10 @@
         } else {
             user.value = null;
             userName.value = "";
+            router.push("/");
         }
         });
-
-        return () => unsubscribe();
-    });
+    }
 
     const handleLogout = async () => {
         try {
