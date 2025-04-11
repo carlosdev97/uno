@@ -13,7 +13,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(p, index) in participantesOrd" :key="index">
+                <tr v-for="(p, index) in participantesOrdenados" :key="index">
                   <td>{{ p.nombre }}</td>
                   <td>#{{ p.ordenTurno }}</td>
                 </tr>
@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { createGame } from "../firebase/CreateGame.js"
 
