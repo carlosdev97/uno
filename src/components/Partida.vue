@@ -8,7 +8,7 @@
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
           <li><button class="dropdown-item" type="button">Ver historial</button></li>
-          <li><button class="dropdown-item" type="button">Salir de la partida</button></li>
+          <li><button class="dropdown-item" type="button" @click="$router.push('/home')">Salir de la partida</button></li>
         </ul>
       </div>
     </nav>
@@ -32,14 +32,20 @@
             <h5>{{ jugador.nombre || `Jugador ${index + 1}` }}</h5>
             <div class="carta-con-contador d-flex align-items-center">
               <img src="../assets/Carta.jpeg" alt="Carta">
-              <h4 class="btn btn-warning m-2"> +{{ jugador.cartas?.length || 0 }} </h4>
+              <h4 class="btn btn-warning m-2"> +{{ jugador.totalCartas || 0 }} </h4>
             </div>
           </div>
           <div class="cartas-mesa">
-            <tr v-for="item in historial" :key="item.id">
-              <td>{{ item.id_carta }}</td>
-            </tr>
-
+            <div v-if="historial.length > 0">
+              <div v-for="item in historial" :key="item.id">
+                <div v-if="item.ordenHistorial === 0" class="carta-inicial-info">
+                  <p><strong>Carta inicial:</strong></p>
+                  <p><strong>Color:</strong> {{ obtenerInfoCarta(item.id_carta)?.color || 'Desconocido' }}</p>
+                  <p><strong>Numero:</strong> {{ obtenerInfoCarta(item.id_carta)?.numero || 'Desconocido' }}</p>
+                  <p><strong>Tipo:</strong> {{ obtenerInfoCarta(item.id_carta)?.tipo || 'Desconocido' }}</p>
+                </div>
+              </div>
+            </div>
           </div>
           <img src="../assets/mesa.png" class="img-mesa" alt="">
         </div>
@@ -57,10 +63,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="carta in cartasDelJugador" :key="carta.id">
+              <tr v-for="carta in cartasJugadorActual" :key="carta.id">
                 <td>
                   <img 
-                    :src="`../assets/carta-azul.png`" 
+                    :src="`../assets/carta-${carta.color || 'azul'}.png`" 
                     :alt="`Carta ${carta.color}`"
                     class="card-image"
                   >
@@ -86,33 +92,61 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { collection, onSnapshot, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot, getDocs, doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useRoute } from 'vue-router';
+import { getAuth } from "firebase/auth";
 
 const route = useRoute();
+const codigoPartida = route.params.codigo;
 const participantes = ref([]);
-const posiciones = ['centrado', 'izquierda', 'derecha', 'abajo']; // Se asigna por orden
-
+const posiciones = ['centrado', 'izquierda', 'derecha', 'abajo'];
 const historial = ref([]);
+const cartasJugadorActual = ref([]);
 const loading = ref(true);
+const auth = getAuth();
+const jugadorActualId = auth.currentUser?.uid;
+const todasLasCartas = ref([]);
 
-// Escuchar jugadores
+
+// Escuchar cartas del jugador actual
 function escucharJugadores(codigo, callback) {
   const jugadoresRef = collection(db, "partidas", codigo, "jugadores");
-  return onSnapshot(jugadoresRef, (snapshot) => {
-    const jugadores = snapshot.docs.map(doc => doc.data());
+  return onSnapshot(jugadoresRef, async (snapshot) => {
+    const jugadores = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    // Para cada jugador, contar las cartas
+    for (const jugador of jugadores) {
+      const cartasRef = collection(db, `partidas/${codigo}/jugadores/${jugador.id}/cartas_jugador`);
+      const cartasSnapshot = await getDocs(cartasRef);
+      jugador.totalCartas = cartasSnapshot.size; // 👈 añadimos total de cartas
+    }
+
     callback(jugadores);
   });
 }
 
-onMounted(async () => { // ✅ Agrega async aquí
-  const codigoPartida = route.params.codigo;
-  
+onMounted(async () => {
+
+  const auth = getAuth();
+  const jugadorActualId = auth.currentUser?.uid;
+
+  // if (jugadorActualId) {
+  //   escucharCartasJugador(codigoPartida, jugadorActualId);
+  // }
+
   // Escuchar jugadores
-  escucharJugadores(codigoPartida, (jugadores) => {
-    console.log("🔥 Jugadores desde Firebase:", jugadores);
+  escucharJugadores(codigoPartida, async (jugadores) => {
     participantes.value = jugadores;
+
+    // Supongamos que el jugador actual es el primero (lógica temporal)
+    const jugadorActualId = jugadores[0]?.id;
+    if (jugadorActualId) {
+      await cargarCartasJugador(jugadorActualId);
+    }
   });
 
   // Cargar historial
@@ -130,18 +164,123 @@ onMounted(async () => { // ✅ Agrega async aquí
   } finally {
     loading.value = false;
   }
+
+  // Asignar cartas al inicio
+  await asignarCartasAJugadores(codigoPartida);
 });
 
-const cartasDelJugador = ref([
-  { id: 1, color: 'rojo', valor: '5' },
-  { id: 2, color: 'azul', valor: '2' },
-  { id: 3, color: 'verde', valor: 'cambio' },
-  { id: 4, color: 'amarillo', valor: '+2' },
-]);
+async function cargarCartasJugador(jugadorId) {
+  const cartasRef = collection(db, `partidas/${codigoPartida}/jugadores/${jugadorId}/cartas_jugador`);
+  const snapshot = await getDocs(cartasRef);
+  cartasJugadorActual.value = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+}
+
+async function asignarCartasAJugadores(codigoPartida) {
+  try {
+    const cartasRef = collection(db, "cartas");
+    const cartasSnapshot = await getDocs(cartasRef);
+    const cartas = cartasSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+    if (cartas.length < 28) {
+      throw new Error("No hay suficientes cartas para repartir a los jugadores.");
+    }
+
+    // Barajar las cartas
+    const cartasBarajadas = cartas.sort(() => Math.random() - 0.5);
+
+    const jugadoresRef = collection(db, `partidas/${codigoPartida}/jugadores`);
+    const jugadoresSnapshot = await getDocs(jugadoresRef);
+    const jugadores = jugadoresSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+    if (jugadores.length < 2) {
+      throw new Error("Debe haber al menos 2 jugadores para repartir las cartas.");
+    }
+
+    for (const jugador of jugadores) {
+      const cartasJugadorRef = collection(
+        db,
+        `partidas/${codigoPartida}/jugadores/${jugador.id}/cartas_jugador`
+      );
+      const cartasExistentesSnapshot = await getDocs(cartasJugadorRef);
+
+      // Si el jugador ya tiene cartas, no asignar más
+      if (!cartasExistentesSnapshot.empty) {
+        console.log(`🔁 Jugador ${jugador.id} ya tiene cartas asignadas.`);
+        continue;
+      }
+
+      // Asignar 7 cartas al jugador
+      const cartasJugador = cartasBarajadas.splice(0, 7);
+      for (const carta of cartasJugador) {
+        const cartaJugadorRef = doc(
+          db,
+          `partidas/${codigoPartida}/jugadores/${jugador.id}/cartas_jugador`,
+          String(carta.id)
+        );
+
+        await setDoc(cartaJugadorRef, {
+          id: String(carta.id),
+          tipo: carta.tipo,
+          color: carta.color,
+          valor: carta.numero,
+          id_jugador: jugador.id,
+        });
+      }
+    }
+
+    // ✅ Elegir una carta inicial del mazo restante y guardarla en el historial
+    if (cartasBarajadas.length > 0) {
+      const historialRef = collection(db, `partidas/${codigoPartida}/historial`);
+
+      // Verificar si ya existe una carta inicial en el historial
+      const historialSnapshot = await getDocs(historialRef);
+      const cartaInicialExistente = historialSnapshot.docs.find(
+        (doc) => doc.data().ordenHistorial === 0
+      );
+
+      if (cartaInicialExistente) {
+        console.log("✅ La carta inicial ya está creada:", cartaInicialExistente.data());
+      } else {
+        const cartaInicial = cartasBarajadas.splice(0, 1)[0];
+
+        const nuevaCartaInicialRef = doc(historialRef);
+
+        await setDoc(nuevaCartaInicialRef, {
+          id_carta: cartaInicial.id,
+          id_jugador: null,
+          ordenHistorial: 0,
+        });
+
+        console.log("📝 Carta inicial guardada en el historial:", cartaInicial);
+      }
+    } else {
+      console.warn("⚠️ No quedaron cartas suficientes para asignar al historial.");
+    }
+
+    console.log("Cartas asignadas correctamente a los jugadores.");
+  } catch (error) {
+    console.error("Error al asignar cartas a los jugadores:", error);
+  }
+}
+
+onMounted(async () => {
+  const cartasRef = collection(db, "cartas");
+  const snapshot = await getDocs(cartasRef);
+  todasLasCartas.value = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+});
+
+function obtenerInfoCarta(idCarta) {
+  return todasLasCartas.value.find(carta => carta.id === idCarta);
+}
 
 function tirarCarta(carta) {
   console.log(`🃏 Carta tirada:`, carta);
-  // Aquí puedes poner lógica para eliminar la carta o lo que necesites
 }
 </script>
 
@@ -178,5 +317,16 @@ function tirarCarta(carta) {
   text-align: center;
   font-style: italic;
   color: #666;
+}
+
+.carta-inicial-info {
+  background-color: #ffffffdd;
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 </style>
