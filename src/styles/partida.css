@@ -77,8 +77,8 @@ main{
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    height: 100%;
-    width: 30%;
+    max-height: 80vh;
+    overflow: hidden;
 }
 .cartas{
     background-color: rgba(255, 255, 255, 0.89);
@@ -87,22 +87,17 @@ main{
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-    width: 100%;
-    max-height: 44vh;
-    overflow-y: auto;
+    max-height: 800px;
 }
+.scroll-tabla {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
 .cartas button{
     font-size: 15px;
     padding: 6px;
     background-color: #920000;
     border: none;
-}
-.cartas table{
-
-    max-height: 50vh;
-    overflow-y: auto;
-    width: 100%;
 }
 
 .cartas th{

@@ -170,7 +170,7 @@ onMounted(async () => {
 });
 
 async function cargarCartasJugador(jugadorId) {
-  const cartasRef = collection(db, `partidas/${codigoPartida}/jugadores/${jugadorId}/cartas_jugador`);
+  const cartasRef = collection(db, `partidas/${codigoPartida}/cartas_jugadores/${jugadorId}/cartas_jugador`);
   const snapshot = await getDocs(cartasRef);
   cartasJugadorActual.value = snapshot.docs.map(doc => ({
     id: doc.id,
@@ -202,7 +202,7 @@ async function asignarCartasAJugadores(codigoPartida) {
     for (const jugador of jugadores) {
       const cartasJugadorRef = collection(
         db,
-        `partidas/${codigoPartida}/jugadores/${jugador.id}/cartas_jugador`
+        `partidas/${codigoPartida}/cartas_jugadores/${jugador.id}/cartas_jugador`
       );
       const cartasExistentesSnapshot = await getDocs(cartasJugadorRef);
 
@@ -217,7 +217,7 @@ async function asignarCartasAJugadores(codigoPartida) {
       for (const carta of cartasJugador) {
         const cartaJugadorRef = doc(
           db,
-          `partidas/${codigoPartida}/jugadores/${jugador.id}/cartas_jugador`,
+          `partidas/${codigoPartida}/cartas_jugadores/${jugador.id}/cartas_jugador`,
           String(carta.id)
         );
 
@@ -227,6 +227,7 @@ async function asignarCartasAJugadores(codigoPartida) {
           color: carta.color,
           valor: carta.numero,
           id_jugador: jugador.id,
+          posiction: String("cartas_jugador"),
         });
       }
     }
