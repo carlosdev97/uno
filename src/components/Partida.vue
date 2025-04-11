@@ -16,7 +16,7 @@
     <main>
       <div class="container-mesa">
         <div class="mesa-top">
-          <button class="btn-baraja">
+          <button class="btn-baraja" @click="robarCarta">
             <img src="../assets/baraja.png" class="img-baraja" alt="">
           </button>
           <p class="m-5" style="color: white;">Turno: Jugador1</p>
@@ -222,7 +222,7 @@ async function asignarCartasAJugadores(codigoPartida) {
         );
 
         await setDoc(cartaJugadorRef, {
-          id: String(carta.id),
+          id: carta.id,
           tipo: carta.tipo,
           color: carta.color,
           valor: carta.numero,
@@ -282,6 +282,94 @@ function obtenerInfoCarta(idCarta) {
 function tirarCarta(carta) {
   console.log(`🃏 Carta tirada:`, carta);
 }
+
+
+async function robarCarta() {
+  try {
+    // Verificar autenticación
+    const auth = getAuth();
+    const user = auth.currentUser;
+    
+    if (!user) {
+      console.error("No hay jugador autenticado");
+      alert("Debes iniciar sesión para robar cartas");
+      return;
+    }
+
+    const jugadorActualId = user.uid;
+    
+    // Verificar que codigoPartida esté definido
+    if (!codigoPartida) {
+      console.error("Código de partida no definido");
+      alert("No se pudo identificar la partida");
+      return;
+    }
+
+    // 1. Obtener todas las cartas del juego
+    const cartasRef = collection(db, "cartas");
+    const cartasSnapshot = await getDocs(cartasRef);
+    const todasLasCartas = cartasSnapshot.docs.map(doc => ({ 
+      id: String(doc.id), // Asegurar que el ID sea string
+      ...doc.data() 
+    }));
+
+    // 2. Obtener cartas ya asignadas
+    const jugadoresRef = collection(db, `partidas/${codigoPartida}/jugadores`);
+    const jugadoresSnapshot = await getDocs(jugadoresRef);
+    
+    let cartasAsignadas = [];
+    
+    for (const jugadorDoc of jugadoresSnapshot.docs) {
+      const cartasJugadorRef = collection(
+        db, 
+        `partidas/${codigoPartida}/jugadores/${jugadorDoc.id}/cartas_jugador`
+      );
+      const cartasJugadorSnapshot = await getDocs(cartasJugadorRef);
+      cartasAsignadas = [...cartasAsignadas, ...cartasJugadorSnapshot.docs.map(doc => String(doc.id))];
+    }
+
+    // 3. Filtrar cartas disponibles
+    const cartasDisponibles = todasLasCartas.filter(
+      carta => !cartasAsignadas.includes(String(carta.id))
+    );
+
+    if (cartasDisponibles.length === 0) {
+      alert("¡No quedan cartas en el mazo!");
+      return;
+    }
+
+    // 4. Seleccionar una carta aleatoria
+    const cartaAleatoria = cartasDisponibles[
+      Math.floor(Math.random() * cartasDisponibles.length)
+    ];
+
+    console.log("ID de carta a asignar:", cartaAleatoria.id, typeof cartaAleatoria.id);
+
+    // 5. Asignar la carta al jugador actual
+    const cartaJugadorRef = doc(
+      db,
+      `partidas/${codigoPartida}/jugadores/${jugadorActualId}/cartas_jugador`,
+      String(cartaAleatoria.id) // Asegurar que el ID sea string
+    );
+    
+    await setDoc(cartaJugadorRef, {
+      id: cartaAleatoria.id,
+      tipo: cartaAleatoria.tipo,
+      color: cartaAleatoria.color,
+      valor: cartaAleatoria.valor || cartaAleatoria.numero,
+      id_jugador: jugadorActualId
+    });
+
+    // Resto del código...
+  } catch (error) {
+    console.error("Error completo al robar carta:", error);
+    alert("Ocurrió un error al robar la carta: " + error.message);
+  }
+}
+
+
+
+
 </script>
 
 <style scoped>
