@@ -53,13 +53,16 @@ main{
     width: 100%;
 }
 .cartas-mesa{
-    width: 60px;
-    height: 90px;
+    width: 10%;
+    height: 25%;
     background-color: rgba(255, 255, 255, 0.995);
     position: absolute;
-    top: 50%;
+    top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .img-mesa {
     width: 100%;   /* Ancho deseado */
@@ -137,5 +140,6 @@ main{
     transform: translateX(-50%);
   }
 
-
-  
+tbody{
+    overflow-y: scroll;
+}
