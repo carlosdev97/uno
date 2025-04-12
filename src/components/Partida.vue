@@ -216,7 +216,7 @@ async function asignarCartasAJugadores(codigoPartida) {
     }
 
     // Barajar las cartas
-    const cartasBarajadas = cartas.sort(() => Math.random() - 0.5);
+    let cartasBarajadas = [...cartas].sort(() => Math.random() - 0.5);
 
     const jugadoresRef = collection(db, `partidas/${codigoPartida}/jugadores`);
     const jugadoresSnapshot = await getDocs(jugadoresRef);
@@ -239,8 +239,8 @@ async function asignarCartasAJugadores(codigoPartida) {
         continue;
       }
 
-      // Asignar 7 cartas al jugador
-      const cartasJugador = cartasBarajadas.splice(0, 7);
+      // Asignar exactamente 7 cartas al jugador
+      const cartasJugador = cartasBarajadas.splice(0, 7); // Extraer 7 cartas del mazo
       for (const carta of cartasJugador) {
         const cartaJugadorRef = doc(
           db,
@@ -254,7 +254,6 @@ async function asignarCartasAJugadores(codigoPartida) {
           color: carta.color,
           valor: carta.numero,
           id_jugador: jugador.id,
-          posiction: String("cartas_jugador"),
         });
       }
     }
