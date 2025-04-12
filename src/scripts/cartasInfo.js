@@ -2,13 +2,13 @@ import { initializeApp } from "firebase/app";
 import { collection, doc, setDoc, writeBatch, getFirestore } from "firebase/firestore"; 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB2yhNTLppG1AINFJ4YcyuK6gLTsT24ytY",
-  authDomain: "proyecto-uno-41069.firebaseapp.com",
-  projectId: "proyecto-uno-41069",
-  storageBucket: "proyecto-uno-41069.firebasestorage.app",
-  messagingSenderId: "549537015388",
-  appId: "1:549537015388:web:b6992be29187a500db2899",
-  measurementId: "G-K57C1S7PVG"
+  apiKey: "AIzaSyCAzBF6W1swc8NqPkvhlDj_sn7fuo5qBj8",
+  authDomain: "monopoly-project-3ac53.firebaseapp.com",
+  projectId: "monopoly-project-3ac53",
+  storageBucket: "monopoly-project-3ac53.firebasestorage.app",
+  messagingSenderId: "1082707434484",
+  appId: "1:1082707434484:web:d4ade051ce8afb99e537a1",
+  measurementId: "G-92NTKNTM5W"
 };
 
 // Initialize Firebase

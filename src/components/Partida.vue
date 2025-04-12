@@ -52,17 +52,18 @@
       </div>
 
       <div class="container-acciones">
-        <div class="cartas">
-          <table class="cartas-table ">
-            <thead>
-              <tr>
-                <th>Imagen</th>
-                <th>Color</th>
-                <th>Valor</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody>
+        <div class="cartas-wrapper">
+    <div class="cartas-scroll-container">
+      <table class="cartas-table">
+        <thead>
+          <tr>
+            <th>Imagen</th>
+            <th>Color</th>
+            <th>Valor</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
               <tr v-for="carta in cartasJugadorActual" :key="carta.id">
                 <td>
                   <img 
@@ -78,8 +79,9 @@
                 </td>
               </tr>
             </tbody>
-          </table>
-        </div>
+      </table>
+    </div>
+  </div>
 
         <div class="acciones">
           <button class="btn btn-success m-3">📣 UNO!!</button>
@@ -109,7 +111,7 @@ const jugadorActualId = auth.currentUser?.uid;
 const todasLasCartas = ref([]);
 
 
-// Escuchar cartas del jugador actual
+// Modifica la función escucharJugadores
 function escucharJugadores(codigo, callback) {
   const jugadoresRef = collection(db, "partidas", codigo, "jugadores");
   return onSnapshot(jugadoresRef, async (snapshot) => {
@@ -118,11 +120,23 @@ function escucharJugadores(codigo, callback) {
       ...doc.data()
     }));
 
+    // Obtener el ID del jugador autenticado
+    const auth = getAuth();
+    const jugadorActualId = auth.currentUser?.uid;
+
     // Para cada jugador, contar las cartas
     for (const jugador of jugadores) {
-      const cartasRef = collection(db, `partidas/${codigo}/jugadores/${jugador.id}/cartas_jugador`);
+      const cartasRef = collection(
+        db, 
+        `partidas/${codigo}/cartas_jugadores/${jugador.id}/cartas_jugador`
+      );
       const cartasSnapshot = await getDocs(cartasRef);
-      jugador.totalCartas = cartasSnapshot.size; // 👈 añadimos total de cartas
+      jugador.totalCartas = cartasSnapshot.size;
+      
+      // Si es el jugador actual, cargar sus cartas
+      if (jugador.id === jugadorActualId) {
+        await cargarCartasJugador(jugadorActualId);
+      }
     }
 
     callback(jugadores);
@@ -130,23 +144,22 @@ function escucharJugadores(codigo, callback) {
 }
 
 onMounted(async () => {
+  const cartasRef = collection(db, "cartas");
+  const snapshot = await getDocs(cartasRef);
+  todasLasCartas.value = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+});
+
+onMounted(async () => {
 
   const auth = getAuth();
   const jugadorActualId = auth.currentUser?.uid;
 
-  // if (jugadorActualId) {
-  //   escucharCartasJugador(codigoPartida, jugadorActualId);
-  // }
-
   // Escuchar jugadores
-  escucharJugadores(codigoPartida, async (jugadores) => {
+  escucharJugadores(codigoPartida, (jugadores) => {
     participantes.value = jugadores;
-
-    // Supongamos que el jugador actual es el primero (lógica temporal)
-    const jugadorActualId = jugadores[0]?.id;
-    if (jugadorActualId) {
-      await cargarCartasJugador(jugadorActualId);
-    }
   });
 
   // Cargar historial
@@ -169,13 +182,27 @@ onMounted(async () => {
   await asignarCartasAJugadores(codigoPartida);
 });
 
+// Asegúrate que cargarCartasJugador use el ID correcto
 async function cargarCartasJugador(jugadorId) {
-  const cartasRef = collection(db, `partidas/${codigoPartida}/cartas_jugadores/${jugadorId}/cartas_jugador`);
-  const snapshot = await getDocs(cartasRef);
-  cartasJugadorActual.value = snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }));
+  if (!jugadorId) {
+    console.error("No se proporcionó ID de jugador");
+    return;
+  }
+  
+  try {
+    const cartasRef = collection(
+      db, 
+      `partidas/${codigoPartida}/cartas_jugadores/${jugadorId}/cartas_jugador`
+    );
+    const snapshot = await getDocs(cartasRef);
+    cartasJugadorActual.value = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    console.log(`Cartas cargadas para jugador ${jugadorId}`);
+  } catch (error) {
+    console.error("Error al cargar cartas:", error);
+  }
 }
 
 async function asignarCartasAJugadores(codigoPartida) {
@@ -267,15 +294,6 @@ async function asignarCartasAJugadores(codigoPartida) {
   }
 }
 
-onMounted(async () => {
-  const cartasRef = collection(db, "cartas");
-  const snapshot = await getDocs(cartasRef);
-  todasLasCartas.value = snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }));
-});
-
 function obtenerInfoCarta(idCarta) {
   return todasLasCartas.value.find(carta => carta.id === idCarta);
 }
@@ -323,7 +341,7 @@ async function robarCarta() {
     for (const jugadorDoc of jugadoresSnapshot.docs) {
       const cartasJugadorRef = collection(
         db, 
-        `partidas/${codigoPartida}/jugadores/${jugadorDoc.id}/cartas_jugador`
+        `partidas/${codigoPartida}/cartas_jugadores/${jugadorDoc.id}/cartas_jugador`
       );
       const cartasJugadorSnapshot = await getDocs(cartasJugadorRef);
       cartasAsignadas = [...cartasAsignadas, ...cartasJugadorSnapshot.docs.map(doc => String(doc.id))];
@@ -349,7 +367,7 @@ async function robarCarta() {
     // 5. Asignar la carta al jugador actual
     const cartaJugadorRef = doc(
       db,
-      `partidas/${codigoPartida}/jugadores/${jugadorActualId}/cartas_jugador`,
+      `partidas/${codigoPartida}/cartas_jugadores/${jugadorActualId}/cartas_jugador`,
       String(cartaAleatoria.id) // Asegurar que el ID sea string
     );
     
@@ -368,54 +386,8 @@ async function robarCarta() {
   }
 }
 
-
-
-
 </script>
 
 <style scoped>
 @import '../styles/partida.css';
-.historial-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.historial-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-.historial-table th, .historial-table td {
-  border: 1px solid #ddd;
-  padding: 12px;
-  text-align: left;
-}
-
-.historial-table th {
-  background-color: #f2f2f2;
-}
-
-.historial-table tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.loading {
-  padding: 20px;
-  text-align: center;
-  font-style: italic;
-  color: #666;
-}
-
-.carta-inicial-info {
-  background-color: #ffffffdd;
-  padding: 20px;
-  border-radius: 15px;
-  text-align: center;
-  font-size: 18px;
-  color: #333;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
 </style>

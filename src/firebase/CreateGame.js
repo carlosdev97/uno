@@ -96,6 +96,7 @@
                 data.estado === "iniciada" &&
                 typeof redirectCallback === "function"
             ) {
+                localStorage.removeItem("codigoPartida");
                 redirectCallback(`/partida/${codigo}`);
             }
             }

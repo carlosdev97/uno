@@ -166,3 +166,103 @@ main{
   .cartas::-webkit-scrollbar-track {
     background-color: #eee;
   }
+
+  .carta-scroll{
+    overflow-y: scroll;
+  }
+
+  .historial-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .historial-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .historial-table th, .historial-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+  }
+  
+  .historial-table th {
+    background-color: #f2f2f2;
+  }
+  
+  .historial-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .loading {
+    padding: 20px;
+    text-align: center;
+    font-style: italic;
+    color: #666;
+  }
+  
+  .carta-inicial-info {
+    background-color: #ffffffdd;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  
+  .cartas-wrapper {
+    padding: 10px;
+  }
+  
+  .cartas-scroll-container {
+    max-height: 60vh; /* 60% del viewport height */
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .cartas-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .cartas-table th {
+    position: sticky;
+    top: 0;
+    background: #898989;
+    padding: 12px 8px;
+    text-align: left;
+  }
+  
+  .cartas-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  /* Estilos personalizados para el scroll */
+  .cartas-scroll-container::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .cartas-scroll-container::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 3px;
+  }
+  
+  .cartas-scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  .cartas-table tbody tr{
+    background-color: #f8f8f8;
+  }
+  /* Efecto hover para filas */
+  .cartas-table tbody tr:hover {
+    background-color: #c8c8c8;
+  }
